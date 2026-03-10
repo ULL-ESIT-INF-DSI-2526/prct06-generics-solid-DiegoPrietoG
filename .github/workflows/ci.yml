@@ -1,0 +1,27 @@
+name: CI tests
+
+on: # Cuando se ejecuta este flujo de trabajo (workflow)
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs: # Definicón de los trabajos a ejecutar
+  build:
+    runs-on: ubuntu-latest # El sistema operativo sobre el que se ejecutará el trabajo
+    
+    strategy: # Estrategia de ejecución del trabajo
+      matrix:
+        node-version: [23.x] # Versiones de Node.js sobre las que se ejecutará el trabajo
+
+    steps: # Pasos a ejecutar en el trabajo
+      - name: Cloning repo # Clonar el repositorio
+        uses: actions/checkout@v4 # Una github action para clonar el repositorio
+      - name: Use Node.js ${{ matrix.node-version }} # Usar la versión de Node.js definida en la matriz
+        uses: actions/setup-node@v4 # Una github action para configurar Node.js
+        with:
+          node-version: ${{ matrix.node-version }} # Especificar la versión de Node.js a usar
+      - name: Install dependencies # Instalar las dependencias del proyecto
+        run: npm install # Comando para instalar las dependencias usando npm
+      - name: Run tests # Ejecutar los tests del proyecto
+        run: npm test # Comando para ejecutar los tests usando npm
