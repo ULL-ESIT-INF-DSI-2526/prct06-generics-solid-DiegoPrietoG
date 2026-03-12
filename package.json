@@ -7,7 +7,7 @@
     "build": "tsc",
     "test": "vitest run",
     "doc": "typedoc",
-    "coverage": "vitest run --coverage --coverage.include src/*"
+    "coverage": "vitest run --coverage --coverage.include src/**/*.ts"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
-import { Salty, TipoPlato } from '../src/ejercicio-modi/ejericicio-modi.ts';
-import { Sweet } from '../src/ejercicio-modi/ejericicio-modi.ts';
-import { CookBook } from '../src/ejercicio-modi/ejericicio-modi.ts';
+import { Salty, TipoPlato } from '../src/ejericicio-modi.ts';
+import { Sweet } from '../src/ejericicio-modi.ts';
+import { CookBook } from '../src/ejericicio-modi.ts';
 
 describe('Pruebas de la clase Salty', () => {
     test('Debe crear una receta Salty y devolver su descripción correctamente', () => {
