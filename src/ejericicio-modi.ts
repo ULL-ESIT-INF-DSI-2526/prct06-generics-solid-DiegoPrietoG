@@ -85,7 +85,9 @@ export class Sweet implements Elaborable<SweetDesc> {
         return this._tiempo_horneado + this._tiempo_preparacion + this._tiempo_refrigeracion;
     }
 }
-
+/**
+ * Clase genérica  CookBook encargada de almacenar la una lista de recetas
+ */
 export class CookBook<T> {
     private readonly _recetas : Elaborable<T>[];
     constructor(recetas : Elaborable<T>[] = []) {
@@ -94,11 +96,18 @@ export class CookBook<T> {
     get recetas() : Elaborable<T>[] {
         return this._recetas;
     }
-
+    /**
+     * Función para añadir una nueva receta
+     * @param receta La receta que se quiere añadir
+     */
     add(receta: Elaborable<T>): void {
         this._recetas.push(receta);
     }
-
+    /**
+     * Remove para borrar una receta en específico.
+     * @param indice - Índice de la receta que se quiere borrar del recetario.
+     * @returns Retorna true or false si es que se puede o no borrar.
+     */
     remove(indice: number): boolean {
         if (indice >= 0 && indice < this._recetas.length) {
             this._recetas.splice(indice, 1);
@@ -106,19 +115,45 @@ export class CookBook<T> {
         }
         return false;
     }
-    get(indice : number) : Elaborable<T> | undefined {
-        if (indice >= this.recetas.length || indice < 0) {throw Error("Fuera de índice");}
+    /**
+     * Busca una receta específica usando su posición en la lista.
+     * @param indice - La posición de la receta (empezando desde 0).
+     * @returns La receta encontrada en esa posición.
+     * @throws Lanza un error si el índice no existe en el recetario.
+     */
+    get(indice: number): Elaborable<T> | undefined {
+        if (indice >= this.recetas.length || indice < 0) {
+            throw Error("Fuera de índice");
+        }
         return this._recetas[indice];
     }
-    size() : number {
+
+    /**
+     * Nos dice cuántas recetas hay guardadas actualmente.
+     * @returns El número total de recetas.
+     */
+    size(): number {
         return this._recetas.length;
     }
+
+    /**
+     * Crea un nuevo recetario que solo contiene las recetas que cumplen una condición.
+     * @param predicado - Una función que recibe una receta y decide si se queda (true) o se descarta (false).
+     * @returns Un nuevo objeto CookBook con el resultado del filtrado.
+     */
     filter(predicado: (receta: Elaborable<T>) => boolean): CookBook<T> {
         const filtradas = this._recetas.filter(predicado);
         return new CookBook<T>(filtradas);
     }
+
+    /**
+     * Calcula el tiempo medio de elaboración sumando todas las recetas.
+     * @returns El promedio de tiempo en minutos, o 0 si no hay ninguna receta.
+     */
     avgTime(): number {
-        if (this._recetas.length === 0) {return 0;}
+        if (this._recetas.length === 0) {
+            return 0;
+        }
         let sumaTotal = 0;
         for (let i = 0; i < this._recetas.length; i++) {
             sumaTotal += this._recetas[i]!.time();
@@ -126,4 +161,5 @@ export class CookBook<T> {
         const promedio = sumaTotal / this._recetas.length;
         return promedio;
     }
+
 }
