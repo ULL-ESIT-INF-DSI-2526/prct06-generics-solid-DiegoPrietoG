@@ -88,19 +88,19 @@ export class Sweet implements Elaborable<SweetDesc> {
 /**
  * Clase genérica  CookBook encargada de almacenar la una lista de recetas
  */
-export class CookBook<T> {
-    private readonly _recetas : Elaborable<T>[];
-    constructor(recetas : Elaborable<T>[] = []) {
+export class CookBook<T extends Elaborable<any>> {
+    private readonly _recetas : T[];
+    constructor(recetas : T[] = []) {
         this._recetas = recetas
     }
-    get recetas() : Elaborable<T>[] {
+    get recetas() : T[] {
         return this._recetas;
     }
     /**
      * Función para añadir una nueva receta
      * @param receta La receta que se quiere añadir
      */
-    add(receta: Elaborable<T>): void {
+    add(receta: T): void {
         this._recetas.push(receta);
     }
     /**
@@ -121,11 +121,11 @@ export class CookBook<T> {
      * @returns La receta encontrada en esa posición.
      * @throws Lanza un error si el índice no existe en el recetario.
      */
-    get(indice: number): Elaborable<T> | undefined {
-        if (indice >= this.recetas.length || indice < 0) {
+    get(indice: number): T {
+        if (indice >= this._recetas.length || indice < 0) {
             throw Error("Fuera de índice");
         }
-        return this._recetas[indice];
+        return this._recetas[indice]!;
     }
 
     /**
@@ -141,7 +141,7 @@ export class CookBook<T> {
      * @param predicado - Una función que recibe una receta y decide si se queda (true) o se descarta (false).
      * @returns Un nuevo objeto CookBook con el resultado del filtrado.
      */
-    filter(predicado: (receta: Elaborable<T>) => boolean): CookBook<T> {
+    filter(predicado: (receta: T) => boolean): CookBook<T> {
         const filtradas = this._recetas.filter(predicado);
         return new CookBook<T>(filtradas);
     }
@@ -150,16 +150,13 @@ export class CookBook<T> {
      * Calcula el tiempo medio de elaboración sumando todas las recetas.
      * @returns El promedio de tiempo en minutos, o 0 si no hay ninguna receta.
      */
-    avgTime(): number {
-        if (this._recetas.length === 0) {
-            return 0;
-        }
-        let sumaTotal = 0;
-        for (let i = 0; i < this._recetas.length; i++) {
-            sumaTotal += this._recetas[i]!.time();
-        }
-        const promedio = sumaTotal / this._recetas.length;
-        return promedio;
-    }
 
+    avgTime(): number {
+        if (this._recetas.length === 0) return 0;
+        let sumaTotal = 0;
+        for (const receta of this._recetas) {
+            sumaTotal += receta.time();
+        }
+        return sumaTotal / this._recetas.length;
+    }
 }

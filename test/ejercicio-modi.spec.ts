@@ -4,7 +4,6 @@ import { Salty, Sweet, CookBook } from '../src/ejericicio-modi.ts';
 describe('Pruebas de la clase Salty', () => {
     test('Debe crear una receta Salty y acceder a sus propiedades (getters)', () => {
         const receta = new Salty("Pasta", "Italia", 20, "principal");
-        // Testeamos los getters para subir cobertura
         expect(receta.nombre_plato).toBe("Pasta");
         expect(receta.pais_origen).toBe("Italia");
         expect(receta.tiempo_preparacion).toBe(20);
@@ -41,52 +40,62 @@ describe('Pruebas de la clase Sweet', () => {
         expect(() => new Sweet("D", 11, 1, 1, 1)).toThrow("Nivel de dificultad incorrecto");
         expect(() => new Sweet("D", 0, 1, 1, 1)).toThrow("Nivel de dificultad incorrecto");
     });
-    test('Debe devolver correctamente el tiempo', () => {
+
+    test('Debe devolver correctamente el tiempo total', () => {
         const postre = new Sweet("tarta", 10, 10, 10, 10);
         expect(postre.time()).toBe(30);
     });
 });
 
 describe('Pruebas de la clase CookBook', () => {
-    test('Debe añadir y eliminar recetas (cobertura de remove)', () => {
-        const miRecetario = new CookBook<string>();
+    test('Debe añadir y eliminar recetas correctamente', () => {
+        // T debe ser Salty | Sweet para aceptar ambas
+        const miRecetario = new CookBook<Salty | Sweet>();
         const receta = new Salty("Ceviche", "Perú", 30, "principal");
         
         miRecetario.add(receta);
         expect(miRecetario.size()).toBe(1);
         
-        // Testeamos remove exitoso
-        const eliminado = miRecetario.remove(0);
-        expect(eliminado).toBe(true);
+        expect(miRecetario.remove(0)).toBe(true);
         expect(miRecetario.size()).toBe(0);
-        
-        // Testeamos remove fallido (índice inexistente) para cubrir el 'else'
-        const noEliminado = miRecetario.remove(99);
-        expect(noEliminado).toBe(false);
+        expect(miRecetario.remove(99)).toBe(false);
     });
 
     test('Debe acceder al getter de la lista completa de recetas', () => {
-        const miRecetario = new CookBook<string>();
+        const miRecetario = new CookBook<Salty>();
         expect(Array.isArray(miRecetario.recetas)).toBe(true);
     });
 
-    test('Debe explotar si el índice en get() es negativo o excesivo', () => {
-        const miRecetario = new CookBook<string>();
+    test('Debe explotar si el índice en get() es incorrecto', () => {
+        const miRecetario = new CookBook<Salty>();
         miRecetario.add(new Salty("A", "B", 1, "postre"));
         
         expect(() => miRecetario.get(-1)).toThrow("Fuera de índice");
         expect(() => miRecetario.get(5)).toThrow("Fuera de índice");
     });
 
-    test('Debe calcular el promedio correctamente', () => {
-        const miRecetario = new CookBook<string>();
-        miRecetario.add(new Salty("A", "B", 10, "entrante"));
-        miRecetario.add(new Salty("C", "D", 20, "principal"));
-        expect(miRecetario.avgTime()).toBe(15);
+    test('Debe calcular el promedio correctamente en un recetario mixto', () => {
+        const miRecetario = new CookBook<Salty | Sweet>();
+        miRecetario.add(new Salty("Salado", "A", 10, "entrante"));
+        miRecetario.add(new Sweet("Dulce", 5, 10, 10, 10)); // Total 30
+        
+        // (10 + 30) / 2 = 20
+        expect(miRecetario.avgTime()).toBe(20);
     });
 
     test('Promedio de recetario vacío debe ser 0', () => {
-        const miRecetario = new CookBook<any>();
+        // Usamos Salty como tipo genérico válido en lugar de any
+        const miRecetario = new CookBook<Salty>();
         expect(miRecetario.avgTime()).toBe(0);
+    });
+
+    test('Debe filtrar recetas por tiempo', () => {
+        const miRecetario = new CookBook<Salty>();
+        miRecetario.add(new Salty("Rápida", "A", 5, "entrante"));
+        miRecetario.add(new Salty("Lenta", "B", 100, "principal"));
+        
+        const filtrado = miRecetario.filter(r => r.time() < 10);
+        expect(filtrado.size()).toBe(1);
+        expect(filtrado.get(0).nombre_plato).toBe("Rápida");
     });
 });
